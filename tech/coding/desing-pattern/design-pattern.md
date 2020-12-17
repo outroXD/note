@@ -5,6 +5,7 @@
 * LaravelでコーディングしていてEloquentは便利なものの、コントローラー上でDBに対する条件などをハードコードする同じような処理がそこら中に散らばっているのが気になった。
 * ハードコードのミスでバグを仕込んだり、テストされていない(=信頼性の低い)同じような処理を1箇所にまとめたいと思った。
 * 追加で実装を加える場合も、他の箇所で動いているコードを呼び出して使う方が、個人的には心理的な安全がある気がする。
+* DIできるので、DBアクセス部分をテストに落とし込める。
 ## デメリット
 * どのような単位でRepositoryクラスを切るかについての共通認識がないと各位好きな単位で処理を切ると思うので、ビジネスロジックのDBアクセスを移管しただけのクラス・メソッド群ができそう。
 ## Laravel + Repository Pattern
@@ -60,7 +61,7 @@ abstract class RepositoryAbstract implements RepositoryInterface
 ```
 
 UsersRepository　　
-```config
+```php
 class UserRepository extends RepositoryAbstract
 {
     public function getModel()
