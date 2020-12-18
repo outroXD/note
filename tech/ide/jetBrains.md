@@ -7,4 +7,4 @@
 2. `URL`は`<~/.ssh/configで設定したホスト名>:path/to/hoge.git`の形で指定るする。  
 
 (2)の設定画面例  
-<img src="../../resource/tech/ide/jetBrains.png">
+<img src="../../resource/tech/ide/jetBrains_1.png">
