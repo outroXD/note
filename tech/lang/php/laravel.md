@@ -37,3 +37,52 @@
 セッションと密結合なビジネスロジックのバグは、プロジェクト後半などで見つかるとリカバリーのコストが全体に波及してしまう。
 3. だからといってSameSite属性をnoneにしてセキュリティレベルを落とすことは間違いだし、ブラウザに依存する作りになってしまう。
 4. そもそも別ドメインへの遷移がある場合は、外部サービス選定時にAPIが提供されているサービスを選ぶべき。これならドメインを跨がないので、上記問題は解決できる。
+
+## Laravel + React + Typescriptの環境を構築する
+* フロントはReactを使いたい。
+* 深く掘ると色々と気になる部分はあるのかも知れないが、暫くはcraに面倒な部分を任せたい。
+* craを使える形で、Laravel + React環境を構築する。
+
+1. 必要なライブラリをインストールする。
+   ```bash
+   composer require laravel/ui
+   ```
+2. 新規プロジェクトLaravelを作成する。
+   ```bash
+   composer create-project --prefer-dist laravel/laravel <プロジェクト名>
+   ```
+3. Reactプロジェクトを作成する。  
+   下記例ではfrontというディレクトリがフロントのソース格納先として作成される。
+   ```bash
+   cd ~/path/to/<プロジェクト名>
+   npx create-react-app front --template typescript
+   ```
+4. LaravelとReactを繋げる。ビルドスクリプトは必要に応じてデプロイ先を変更する。  
+   `front/package.json`を編集する。  
+   ここでは適当にpublicに載せてる。フロントエンド用ディレクトリがある場合、そこにビルド先を差し替える。  
+   ```json
+   "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "build:prod": "npm run-script build && mv build/* ../public",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+   },
+   ```
+5. Reactプロジェクト(front配下)をコンパイルする。
+   ```bash
+   npm run build:prod
+   ```
+6. 適当にルートを設定する。
+   ```php
+   Route::fallback(function () {
+    return file_get_contents(public_path('index.html'));
+   });
+   ```
+7. Laravelを起動する。
+   ```bash
+   php artisan serve
+   ```
+
+* `npm`や`npx`などは本当はローカルPC環境に入れたくない。全部コンテナ上で完結させたいが、コンテナ力不足なのと、考え方としてあっているのかに自信がないので取り敢えずローカルに入れた。
+* 所謂マイクロサービスアーキテクチャ的なイメージ？でコンテナ間で連動させ、その「結果」をホストPCに反映させれば良いのだろうけど、そもそも面倒臭い。
