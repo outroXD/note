@@ -75,8 +75,12 @@
    ```
 6. 適当にルートを設定する。
    ```php
+   //Route::get('/', function () {
+   //    return view('welcome');
+   //});
+
    Route::fallback(function () {
-    return file_get_contents(public_path('index.html'));
+       return file_get_contents(public_path('index.html'));
    });
    ```
 7. Laravelを起動する。
