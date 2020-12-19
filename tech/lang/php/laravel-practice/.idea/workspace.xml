@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ee7955a4-c98e-412f-b8fa-3bfd10a9e938" name="Default Changelist" comment="React app 追加 Reactの練習用プロジェクト">
+    <list default="true" id="ee7955a4-c98e-412f-b8fa-3bfd10a9e938" name="Default Changelist" comment="LaravelとReactの繋ぎ込み">
+      <change afterPath="$PROJECT_DIR$/../../front/react/react.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../javaScript/javaScript.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/front/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/front/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/favicon.ico" beforeDir="false" afterPath="$PROJECT_DIR$/public/favicon.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/robots.txt" beforeDir="false" afterPath="$PROJECT_DIR$/public/robots.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
   </component>
@@ -169,7 +166,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1608376057570</updated>
-      <workItem from="1608376060953" duration="1297000" />
+      <workItem from="1608376060953" duration="3711000" />
+      <workItem from="1608389855993" duration="6000" />
     </task>
     <task id="LOCAL-00001" summary="laravel-practice 追加 laravelの練習用プロジェクト">
       <created>1608376144903</created>
@@ -185,7 +183,14 @@
       <option name="project" value="LOCAL" />
       <updated>1608376362229</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="LaravelとReactの繋ぎ込み">
+      <created>1608377562327</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1608377562327</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -201,10 +206,12 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="laravel-practice 追加 laravelの練習用プロジェクト" />
     <MESSAGE value="React app 追加 Reactの練習用プロジェクト" />
-    <option name="LAST_COMMIT_MESSAGE" value="React app 追加 Reactの練習用プロジェクト" />
+    <MESSAGE value="LaravelとReactの繋ぎ込み" />
+    <option name="LAST_COMMIT_MESSAGE" value="LaravelとReactの繋ぎ込み" />
   </component>
 </project>
