@@ -82,9 +82,6 @@
 ### プロトタイプベース
 * プロトタイプベースでは、オブジェクトは直接他のオブジェクトを継承する。その時継承元になったオブジェクトをプロトタイプという。
 * プロトタイプは`__proto__`に格納されている。
-### thisについて
-* JavaScriptにおけるthisは「グローバル変数だが、関数内では実行時に呼び出し側から暗黙的に与えられる引数」と考えると良い。
-  * Pythonではメソッドの第一引数selfと明示的に書く必要がある。
 
 
 
@@ -129,6 +126,117 @@
   ```
   * 左辺がtrueだと、右辺に値を渡していく
   
+
+
+## thisについて
+### 1. new演算子をつけて呼び出し
+* JavaScriptにおけるthisは「グローバル変数だが、関数内では実行時に呼び出し側から暗黙的に与えられる引数」と考えると良い。
+  * Pythonではメソッドの第一引数selfと明示的に書く必要がある。
+* `new`演算子
+  1. prototypeオブジェクトをコピーする。
+  2. 引数thisとして関数に渡す。
+### 2. メソッドとして実行したとき
+* メソッドとして実行されたとき、そのアクセス演算子`.`の前のオブジェクトが`this`に入る。
+### 3. (1), (2)以外の関数/非Strictモード
+* ブラウザなら`Window`オブジェクト、Node.jsなら`global`を指す。
+### 4. (1), (2)以外の関数/非Strictモード
+* new演算子を使わずに関数を定義すると、グローバルオブジェクトにプロパティが追加されてします。
+  * `use strict`を使えば制限できる。
+* `use strict`を使うと、関数がオブジェクトのコンテキストにない中定義された場合、値がundefinedになる。
+```javascript
+'use strict';
+const Person = function (name) {
+    this.name = name;
+}
+Person('keisuke');  // undefinedなので、Uncaught TypeErrorで通らない
+```
+### class + this
+メソッド内関数の実行コンテキストはオブジェクトではない。  
+`use strict`しているので、関数にはundefinedが入る。  
+なのでgreet()の呼び出しで例外が起こる。
+```javascript
+'use strict';
+class Person {
+    constructor (name) {
+        this.name = name;
+    }
+    
+    greet () {
+      const doIt = function () {
+        console.log(`${this.name}が挨拶をした。`);
+      };
+      doIt();
+    };
+};
+```
+上記問題に対して以下のように定義することで回避できる。
+```javascript
+class Person {
+    constructor (name) {
+        this.name = name;
+    }
+    
+    greet1 () {
+        const doIt = function () {
+            console.log(`${this.name}が挨拶をした。`)
+        };
+        const bindedDoIt = doIt.bind(this);
+        bindedDoIt();
+    };
+    
+    greet2 () {
+        const doIt = function () {
+            console.log(`${this.name}が挨拶をした。`);
+        };
+        doIt.call(this);
+    };
+    
+    greet3 () {
+        const _this = this;
+        const doIt = function () {
+            console.log(`${_this.name}が挨拶をした。`);
+        };
+        doIt();
+    }
+    
+    greet4 () {
+        const doIt = () => {
+            cosole.log(`${this.name}が挨拶をした。`);
+        };
+        doIt();
+    };
+    
+    greet5 = () => {
+        const doIt = () => {
+            console.log(`${this.name}が挨拶をした。`);
+        };
+        doIt();
+    };
+};
+```
+`greet4`, `greet5`(アロー関数式)の定義は、`this`のコンテキストを暗黙的に外側のスコープのthisの値を参照するようになる。  
+言語仕様的な一貫性はないが、他の言語に慣れている場合は直感的に使用できる。  
+
+* thisはクラス構文内でしか使わない。
+* クラス構文内では、メソッドを含めたあらゆる関数定義をアロー関数式で行う。
+
+
+
+# 関数型プログラミング on JavaScript
+## コレクション反復
+| 関数 | 引数 | メモ |
+| ---- | ---- | --- |
+| map() | | 対象の配列の要素一つ一つを任意に加工した新しい配列を返す |
+| filter() | | 与えた条件に適合する要素だけを抽出した新しい配列を返す |
+| find() | | 与えた条件に適合した最初の要素を返す。見つからない場合はundefinedを返す |
+| findIndex() | | 与えた条件に適合した最初の要素のインデックスを返す。 見つからない場合は-1を返す |
+| every() | | 与えた条件を全ての要素が満たすかを真偽値で返す |
+| some() | | 与えた条件を満たす要素が一つでもあるかを真偽値で返す |
+| reduce() | 第一引数:前回の関数の実行結果 第二引数:配列の各要素 | 前回の実行結果(第一引数)に対して、今回の値(第二引数)を作用させた結果を返す |
+| sort() | |  |
+| includes() | | |
+
+
 
 ## 参考
 * [Airbnb Style Guide](https://github.com/airbnb/javascript)
