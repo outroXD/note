@@ -222,7 +222,7 @@ class Person {
 
 
 
-# 関数型プログラミング on JavaScript
+## 関数型プログラミング on JavaScript
 ## コレクション反復
 | 関数 | 引数 | メモ |
 | ---- | ---- | --- |
@@ -235,8 +235,21 @@ class Person {
 | reduce() | 第一引数:前回の関数の実行結果 第二引数:配列の各要素 | 前回の実行結果(第一引数)に対して、今回の値(第二引数)を作用させた結果を返す |
 | sort() | |  |
 | includes() | | |
+## カリー化
+## 関数部分適用
+```javascript
+const withMultiple = (n) => (m) => n * m;
+const triple = withMultiple(3);
+console.log(triple(5));
+```
+## クロージャ
+```javascript
+const counter = (count = 0) => (adds = 1) => count += adds;
+const increment = counter();
+```
+## 非同期処理
+TODO
 
 
-
-## 参考
+# 参考
 * [Airbnb Style Guide](https://github.com/airbnb/javascript)
