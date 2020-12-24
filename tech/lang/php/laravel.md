@@ -55,7 +55,7 @@
    下記例ではfrontというディレクトリがフロントのソース格納先として作成される。
    ```bash
    cd ~/path/to/<プロジェクト名>
-   npx create-react-app front --template typeScript
+   npx create-react-app front --template typescript
    ```
 4. LaravelとReactを繋げる。ビルドスクリプトは必要に応じてデプロイ先を変更する。  
    `front/package.json`を編集する。  
