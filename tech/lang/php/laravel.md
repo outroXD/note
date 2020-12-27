@@ -25,6 +25,34 @@
 
 
 # Tips
+## tinkerで色々
+tinker(REPL)を使うことで、今の環境変数とか、スクリプトの実行とかできる。  
+  
+起動
+```bash
+php artisan tinker
+```
+### Laravelが読み込んでいるDB情報を確認
+```bash
+>>> DB::connection()->getConfig();
+=> [
+     "driver" => "mysql",
+     "host" => "goat-charts-db",
+     "port" => "3307",
+     "database" => "goat",
+     "username" => "root",
+     "password" => "password",
+     "unix_socket" => "",
+     "charset" => "utf8mb4",
+     "collation" => "utf8mb4_unicode_ci",
+     "prefix" => "",
+     "prefix_indexes" => true,
+     "strict" => true,
+     "engine" => null,
+     "options" => [],
+     "name" => "mysql",
+   ]
+```
 ## 外部サービス(別ドメイン)を使用するときはCookieに依存しない組み方を前提にするか、外部サービスAPIを使う
 * 別ドメイン上に存在する外部決済サービスを使用した時、外部サービス→Laravelアプリケーションの戻ってくる遷移で認証切れが発生した。
 * Laravel(というか普通のWebアプリ)ではCookieを使ってセッションを実現する。
