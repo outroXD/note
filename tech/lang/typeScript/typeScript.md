@@ -190,6 +190,7 @@ const prive: ICurrency = { unit: 'JPY', amount: 1000 };
 * インターフェイスは`拡張に対してオープン`な性質がある。
   * 以下例のように、プロパティの定義が追加されていく。
   * どこでも追加できてしまうので、メンテナンス性に乏しく、バグに繋がりやすい。
+  * 型エイリアスの方が良さそう。
 ```typescript
 interface User {
     name: string;
@@ -205,4 +206,193 @@ interface User {
 
 const rolley: User = { name: 'Rolley Cocker', age: 8,  species: 'dog' };
 ```
+## ユニオン型
+* `|`で型を並べて定義。
+* 既存の型を組み合わせて、複雑な型を表現できる。
+  * 定義に並べられた型のいずれかが適用される。
+```typescript
+type A = {
+    foo: number;
+    bar?: string;
+}
 
+type B = { foo: string };
+
+type AorB = A | B;
+```
+## インターセクション型
+* `&`で型を並べて定義。
+* 内部のプロパティがマージされるイメージ。
+```typescript
+type A = { foo: number };
+type B = { bar: string };
+
+type AnB = A & B;
+```
+* インターフェースの拡張をインターセクション型で行う。
+```typescript
+type Unit = 'USD' | 'EUR' | 'JPY' |  'GBP';
+interface Currency {
+    unit: Unit;
+    amount: number;
+}
+
+interface IPayment extends Currency {
+    date: Date;
+}
+
+type IPayment = Currency & {
+    date: Date;
+};
+
+const date = new Date('2020-09-01T12:00+0900');
+const payA: IPayment = { unit: 'JPY', amount: 10000, date };
+const payB: TPayment = { unit: 'USD', amount: 100, date };
+```
+## 型の演算子
+### typeof
+* 値の型の名前を文字列にして取り出す。
+* 型推論で既存の変数から型を抜き出して使いまわせる。
+```typescript
+console.log(typeof 100)  // 'number'
+
+const arr = [1, 2, 3];
+type NumArr = typeof arr;
+const val: NumArr = [4, 5, 6];
+```
+### keyof
+* 既存のオブジェクトから型を抽出できる。
+```typescript
+const permissions = { 
+    r: 0b100 as const, w: 0b010 as const, x: 0b001 as const,
+};
+type PermsChar = keyof typeof permissions;  // 'r' | 'w' | 'x'
+typePermsNum=typeofpermissions[PermsChar];  //1|2|4
+```
+### その他ユーティリティ
+* `Partial<T>`
+  * Tのプロパティを全て省略可能にする。
+* `Required<T>`
+  * Tのプロパティを全て必須にする。
+* `Readonly<T>`
+  * Tのプロパティを全て読み取り専用にする。
+* `Pick<T, K>`
+  * TからKが指定するキーのプロパティだけを抜き出す。
+  ```typescript
+  type PickedTodo = Pick<Todo, 'title' | 'isDone'>;  // titleとisDoneを抜き出したオブジェクトが返る
+  ```
+* `Ommit<T, K>`
+  * TからKが指定するキーのプロパティを省く。
+* `Extract<T, U>`
+  * TからUの要素だけを抜き出す。
+* `Exclude<T, U>`
+  * TからUの要素を省く。
+* `NonNullable<T>`
+  * Tからnullとundefinedを省く。
+* `Parameters<T>`
+  * Tの引数の型を抽出し、タプル型で返す。
+* `ReturnType<T>`
+  * Tの戻り値の型を返る。
+### 型アサーション
+### 型ガード
+プリミティブ型向け
+```typescript
+const foo: unknown = '1,2,3,4';
+
+if (typeof foo === 'string') {
+    console.log(foo.split(','));
+}
+```
+クラスのインスタンス向け
+```typescript
+class Base { common = 'common'; }
+class Foo extends Base { foo = () => { console.log('foo'); }}
+class Bar extends Base { bar = () => { console.log('bar'); }}
+
+const doDivide = (arg: Foo | Bar) => {
+    if (arg instanceof Foo) {
+        arg.foo();
+    } else {
+        arg.bar();
+    }
+}
+```
+### 型術後
+
+## 関数
+### オーバーロード
+
+
+
+# JSX
+## サンプルコード例
+### main的な部分
+```typescript
+import React from 'react';
+import Greets from './components/Greets';
+import SummaryText from './components/SummaryText';
+import TextInput from './components/TextInput';
+import './App.css';
+
+const App: React.FunctionComponent = () => (
+  <div className="App">
+    <Greets name="Patty" times={4}>
+      <span role="img" aria-label="rabbit">🐰</span>
+    </Greets>
+    <SummaryText>
+      &lt;Summary&gt;<br />
+      Patty Hope-rabbit, along with her family, arrives in Maple Town,
+      a small town inhabited by friendly animals.
+
+      Soon, the Rabbit Family settles in Maple Town as mail carriers and the bitter,
+      yet sweet friendship of Patty and Bobby begins to blossom.
+    </SummaryText>
+    <TextInput />
+  </div>
+);
+
+export default App;
+```
+* 各コンポーネントをimport。
+```typescript
+import React from 'react';
+
+type Props = { name: string; times?: number };
+
+const Greets: React.FunctionComponent<Props> = (props) => {
+  const { name, times = 1, children } = props;
+
+  return (
+    <>
+      {[...Array(times)].map((_) => (
+        <p>Hello, {name}! {children}</p>
+      ))}
+    </>
+  );
+};
+
+export default Greets;
+```
+* childrenにはAppのspanが入ってくる。
+* returnで返されるJSXが最終的にはレンダリングを経てHTMLへ。
+```typescript
+import React from 'react';
+
+const TextInput: React.FunctionComponent = () => {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleClick = (): void => {
+    console.log(inputRef.current);
+    if (inputRef.current) inputRef.current.focus();
+  };
+
+  return (
+    <div>
+      <input type="text" ref={inputRef} />
+      <input type="button" value="Focus" onClick={handleClick}/>
+    </div>
+  );
+};
+
+export default TextInput;
+```
