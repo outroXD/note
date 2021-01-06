@@ -22,3 +22,5 @@
   ```
 * IDEからだと権限の問題で`/usr/*`を参照することができなかった。取り急ぎ`/usr/local/Cellar/ant@1.9/<version number>`をデスクトップにコピーしてきて、IDEで参照した。
 * 上記エラーは出力されなくなった。公式のzipと比べてどんな差分があるのかよく分からないが、権限問題を解決して、brew経由で落としたライブラリを参照する方が良さそう。
+### 参考
+* https://igorkhromov.com/2019/04/08/install-apache-ant-on-macos-with-brew
