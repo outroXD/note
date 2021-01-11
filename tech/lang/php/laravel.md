@@ -25,6 +25,19 @@
 
 
 # Tips
+## Laravel8でのルーティング設定
+Laravel8から、ルーティング設定時のコントローラ指定はフルパスで指定しないとクラスを見つけられず、エラーで落ちる。
+
+Laravel8以前
+```php
+Route::get('/test', 'TestController@test')->name('test');
+```
+
+Laravel8
+```php
+Route::get('/test', 'App\Http\Controllers\TestController@test');
+```
+
 ## tinkerで色々
 tinker(REPL)を使うことで、今の環境変数とか、スクリプトの実行とかできる。  
   
