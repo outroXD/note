@@ -3,8 +3,13 @@
 * Intellij IDEAとEclipseだと、概念ややりたいことの実現方法が色々異なる。「Eclipseでやっていたこの作業、Intellij IDEAではどうやるのか？」という観点でメモ。
 ### Javaプロジェクトのビルドパスにソース/プロジェクト/ライブラリを追加する
 #### Eclipse
+* プロジェクトを右クリック > `ビルド・パス` > `ビルド・パスの構成` > `ソース`、`プロジェクト`、`ライブラリー`に追加する。  
+
 <img src="../../resource/tech/ide/eclipse_1.gif">
+
 #### Intellij IDEA
+* `File` > `Project Structure` > `Project Settings` > `Module` > `+` > `JAR's or Directories`、`Library`、`Module Dependencies`に追加する。
+
 <img src="../../resource/tech/ide/jetBrains_4.gif">
 
 
