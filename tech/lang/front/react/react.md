@@ -7,10 +7,37 @@
 * `Container Component`
   * 機能を責務とするコンポーネント。
 
+
+
+# props
+* コンポーネントを関数とみた時の引数にあたる。
+* 暗黙のpropsとして子要素が渡される。
+* propsの渡し方
+  * コンポーネントが関数の場合はその関数の第一引数としてpropsが渡される。
+  * コンポーネントがクラスの場合は初期化時にメンバーオブジェクトpropsとして渡される。
+### 実装例
+* CharacterListにcharactersを渡す例。
+```typescript
+return (
+      <div className="container">
+        <header>
+          <h1>『SLAM DUNK』登場人物</h1>
+        </header>
+        <CharacterList school="湘北高校" characters={characters} />
+      </div>
+  );
+```
+
+
+
 # State Hooks
 * アプリの「状態」をどう扱うか考える上で選択肢の一つ。
 ## 実装例
 ```typescript
+type State = { 
+    count: number;
+};
+
 const Counter: FC = () => {
     const [count, setCount] = useState(0);
     const reset = () => setCount(0);
@@ -38,14 +65,24 @@ const Counter: FC = () => {
 ```
 * `useState()`
   * 変数とその変数のsetterを返す。useStateを経由して「状態」変数を扱う。
+  * useStateに引数を渡すと、それが初期値になる。
+  * 必ず関数コンポーネントのトップレベルで呼び出すこと。
+* 例えば外部APIの返却値を取得して、stateに入れようとすると、事前に型が分からないので初期値を指定できない。  
+  `useState()`に型引数を渡す事で型推論をパスする。
+
+
+
 # Effect Hooks
+* Effect HookはState Hookと一緒に扱われることが多い。
 * 副作用を扱う為のAPI。
 * 副作用の具体例
   * データの取得
   * リアクティブな講読
   * ログの記録
   * リアルDOMの手動書き換え
-## 実装例
+  
+## useEffect
+### 実装例
 ```typescript
 const SampleComponent: FC = () => {
     const [date, setDate] = useState();
@@ -56,15 +93,83 @@ const SampleComponent: FC = () => {
     }, [someDeps]);
 };
 ```
-* `useState()`
-* `someDeps`
-  * 依存配列。
-  * レンダリング時と比較して、依存配列内の要素に差分があれば、第一引数の関数が実行される。
+* `useEffect()`
+  * 第一引数に引数を取らない関数を指定する。
+  * 第一引数：コンポーネントがアンマウントされる時に戻り値の関数を実行してくれる。
+  * 第二引数
+    * `someDeps`
+      * 依存配列。
+      * レンダリング時と比較して、依存配列内の要素に差分があれば、第一引数の関数が実行される。
+      * 依存配列に空配列を渡す → `componentDidMount`
+      * 依存配列に空配列を渡さない → `componentDidUpdate`
+  * 上記`doSomething()`でstate変数を書き換えたりする。
+  * useEffectの初回実行は最初のレンダリングが行われ、ブラウザに反映された直後。  
+    その後、副作用が反映された内容で再度レンダリングされる。
+    * ロード中のプレースホルダーを表示するなど。
+## Effect Hooksとライフルサイクルの相違点
+1. 実行タイミング
+   * `useEffect`と`componentDidMount`
+     * `componentDidMount`
+       * 仮想DOMがリアルDOMへ反映される前に、ブラウザへの表示をブロックして実行される。この処理が終わるまでブラウザには何も表示されない。
+     * `useLayoutEffect`
+       * Effect Hooksでは`componentDidMount`や`componentDidUpdate`と同じ動きをするのが`useLayoutEffect`。
+## useMemo
+* 関数コンポーネントの中で、計算リソースを多く消費する処理がある際にはメモ化して保存しておく事で2回目以降の処理速度を最適化できる。
 
-## 後で整理する
+実装例
+```typescript
+const Timer: FC<{ limit: number }> = ({ limit }) => {
+    const [timeLeft, setTimeLeft] = useState(limit);
+    const prime = useMemo(() => getPrimes(limit), [limit]);
+};
+```
+* `useMemo()`
+  * 計算結果をコンポーネントの外に保存しておく。
+  
+## useCallback
+* メモ化したコールバックを返却する。
+* 関数そのものをメモ化するのに使用される。
+
+```typescript
+const memoizedCallback = useCallback(
+        () => {
+            doSomething(a, b);
+        },
+        [a, b],
+);
+```
+* 依存配列`[a, b]`の内容が書き換わる度にuseCallbackの第一引数が再定義される。
+* 下記処理は等価
+```typescript
+useCallback(fn, deps)
+```
+```typescript
+useMemo(() => fn, deps)
+```
+
+
+## useRef
+* リアルDOMへの参照に使う。
+```typescript
+const TextInput: FC = () => {
+    const inputRef = useRef<HTMLInputElement>();
+    
+    return (
+        <>
+                <input ref={inputRef} type="text">
+        </>
+    );
+}
+```
+* 上記例の様に、useRefで生成したオブジェクトをJSX内でrefに渡す事で、`inputRef.current`から参照できるようになる。
+
+
+# 後で整理する
 * `public/index.html`の`<div id="root"></div>`の中身が、`src/index.tsx`の`RenderDOM.render()`の第二引数`document.getElementById('root')`に紐づく。
   * `RenderDOM.render()`の第一引数はJSXというもの。
 * `public/index.html`と`src/index.tsx`は、Babelでコンパイル→webpackでまとめられた結果、`/static/js/main.chunk.js`の中で紐づけられている。
+
+
 
 # cheet sheet
 ## 関数コンポーネント
@@ -105,4 +210,24 @@ class App extends Component<unknown, State> {
 ### componentDidMount
 * コンポーネントがマウントされた直後に呼ばれるメソッド。
 * `コンポーネントがマウントされる`とは、
-## 
+
+## イベント発火
+* コンポーネント内関数 + onClickで実現できる
+```typescript
+const clicekEvent = () => {};
+
+...
+
+return (
+    <>
+            <input onCLick={clickEvent}>
+    </>
+            
+);
+```
+
+
+# Linter
+* react-hooks/rules-of-hooks
+* eslint-plugin-react-hooks/exhaustive-deps
+  * useMemo, useCallbackに渡される依存配列が正しいかをチェックしてくれる。
