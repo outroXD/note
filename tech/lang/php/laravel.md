@@ -75,6 +75,16 @@ composer init
 ### 大元Laravelプロジェクトのcomposer.jsonに追加したライブラリの読み込み設定を追加追加tsuika
 ```json
 {
+  "require": {
+        "php": "^7.4|^8.0",
+        "fideloper/proxy": "^4.4",
+        "fruitcake/laravel-cors": "^2.0",
+        "guzzlehttp/guzzle": "^7.2",
+        "laravel/framework": "^8.12",
+        "laravel/tinker": "^2.5",
+        "goat/edgar": "dev-main" // ここ
+    },
+  
   <略>
   
   "repositories": [{
