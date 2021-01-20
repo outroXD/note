@@ -72,7 +72,7 @@ composer init
     }
 }
 ```
-### 大元Laravelプロジェクトのcomposer.jsonに追加したライブラリの読み込み設定を追加tsuika
+### 大元Laravelプロジェクトのcomposer.jsonに追加したライブラリの読み込み設定を追加追加tsuika
 ```json
 {
   <略>
