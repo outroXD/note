@@ -25,6 +25,66 @@
 
 
 # Tips
+## Laravelでパッケージ開発
+* プロジェクトディレクトリ配下に`packages`ディレクトリを作成し、その中でライブラリとして実装する。
+* packages内で実装したライブラリをLaravelプラグインとして読み込むことで、アプリの中に組み込む。
+* ディレクトリ完成イメージ  
+  <img src="../../../resource/tech/lang/php/01_php.png" />
+### ライブラリ向けディレクトリの作成
+* `packages`配下に各種ライブラリのフォルダを配備していく。
+### composer.json作成
+* `packages/<ライブラリルート>`へ移動し、`composer init`する。
+```bash
+composer init
+```
+### Laravel用のサービスプロバイダを作成
+```bash
+```
+### composer.josnに設定追加
+* jsonにlaravelが読み取る用の設定を追加。
+  * `autoload`、`extra`が追加部分。
+    * ソースディレクトリのパス設定
+    * サービスプロバイダの指定
+```json
+{
+    "name": "goat/edgar",
+    "authors": [
+        {
+            "name": "outroXD",
+            "email": "keisuke.nakasuga+githubXD@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4",
+        "laravel/framework": "^8.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "Goat\\Edgar\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Goat\\Edgar\\EdgarServiceProvider"
+            ]
+        }
+    }
+}
+```
+### 大元Laravelプロジェクトのcomposer.jsonに追加したライブラリの読み込み設定を追加tsuika
+```json
+{
+  <略>
+  
+  "repositories": [{
+        "type": "path",
+        "url": "packages/Edgar",
+        "symlink": true
+    }
+    ]
+}
+```
 ## Laravel8でのルーティング設定
 Laravel8から、ルーティング設定時のコントローラ指定はフルパスで指定しないとクラスを見つけられず、エラーで落ちる。
 
