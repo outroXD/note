@@ -5,10 +5,8 @@
 ```python
 # -*- coding: utf-8 -*-
 
-
 from enum import Enum
 from collections import namedtuple
-
 
 class Conditions(Enum):
     A = ('A', lambda x: x)
@@ -42,3 +40,5 @@ def test():
 if __name__ == '__main__':
     a, b, c = test()
 ```
+### 問題点
+* namedtupleに与える引数を作る箇所の順番依存になってしまう。
