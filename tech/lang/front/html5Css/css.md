@@ -24,6 +24,8 @@
 * `<section>`
 ### インライン要素の特徴
 * インライン要素同士は並ぶと横に配置される。
+* 高さを指定できない。
+  * 高さ・幅を指定したい場合は`display:block`や`display:inline-block`を指定する。
 
 # スタイル
 ## display
@@ -34,6 +36,47 @@
     
 ## transition
 * CSSプロパティが変化する際のアニメーション速度を制御する。
+
+# レスポンシブ
+* 複数の端末の画面に対するスタイルを1CSSで記述する際のテクニック。
+PCをベースにCSSを作成する場合。
+## 画面サイズに応じて当てるCSSを変える
+```css
+/* PC用のCSSはメディアクエリの外に記述する */
+
+@media screen and (max-width: 959px) {
+	/* 959px以下に適用されるCSS（タブレット用） */
+}
+@media screen and (max-width: 480px) {
+	/* 480px以下に適用されるCSS（スマホ用） */
+}
+```
+スマホをベースにCSSを作成する場合。
+```css
+/* スマホ用のCSSはメディアクエリの外に記述する */
+
+@media screen and (min-width: 481px) {
+	/* 481px以上に適用されるCSS（タブレット用） */
+}
+@media screen and (min-width: 960px) {
+	/* 960px以上に適用されるCSS（PC用） */
+}
+```
+## 要素の縦揃え
+* IE9以上のモダンブラウザがターゲットの時のみ有効。
+```css
+display: flex;
+justify-content: center;
+align-items: center;
+```
+## 要素を非表示
+* PCサイトでは非表示にしたいが、スマホサイトでは表示したいような要素がある場合がある。
+* `display:none;`をメディアクエリーと合わせて使う。
+```css
+対象の要素名 {
+  display: none;
+}
+```
 
 # tips
 ## 「構造」と「見た目」の分離
