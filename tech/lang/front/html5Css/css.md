@@ -77,6 +77,21 @@ align-items: center;
   display: none;
 }
 ```
+## 背景の設定
+```css
+height: 500px;
+background-image: url("../img/main.jpg");
+```
+上記設定だと、下記スクショのように繰り返されてしまう。  
+CSSを追加して整える。  
+<img src="../../../../resource/tech/lang/front/front_01.png">
+```css
+height: 500px;
+background-image: url("../img/main.jpg");
+background-position: center;
+background-size: cover;
+```
+<img src="../../../../resource/tech/lang/front/front_02.png">  
 
 # tips
 ## 「構造」と「見た目」の分離
