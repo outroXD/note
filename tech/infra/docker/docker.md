@@ -1,5 +1,46 @@
 # Docker
 # Tips
+## [ERROR] --initialize specified but the data directory has files in it. Aborting.
+### 症状
+* Windows10でdocker-compose時、下記エラーでMySQLコンテナが起動しない。
+```bash
+docker-compose up
+
+...
+
+work-atled-mysql    | 2021-02-18T08:57:20.647696Z 0 [ERROR] --initialize specified but the data directory has files in it. Aborting.
+work-atled-mysql    | 2021-02-18T08:57:20.647730Z 0 [ERROR] Aborting
+```
+```Dockerfile
+FROM mysql:5.7
+
+USER root
+ADD ./cnf/my.cnf /etc/mysql/my.cnf
+RUN chmod 644 /etc/mysql/my.cnf
+
+USER mysql
+```
+```ini
+[client]
+default-character-set=utf8
+
+[mysqld]
+datadir=/var/lib/mysql
+character-set-server=utf8
+log_bin_trust_function_creators=1
+expire_logs_days=10
+binlog_format=mixed
+default-storage-engine=InnoDB
+max_allowed_packet = 8M
+sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+skip_ssl
+general_log=1
+general_log_file=/var/log/mysql/general-query.log
+```
+### 解決方法
+
+
+
 ## MySQL5.7のコンテナを作成し、docker-composeで立ち上げる時`chown: changing ownership of '<ファイル名>': Operation not permitted`
 ### 症状
 
