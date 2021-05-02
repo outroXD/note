@@ -495,10 +495,142 @@ p func2
 # 例外処理
 * 例外が発生する可能性のある部分を`begin, end`で囲む。
   * pythonのtry, catchに該当。
-* その中の`rescue`節で例外発生時の処理を記述する。
-* その中の`else`節でresucure節が`実行されなかったとき`の処理を書く。
+* `rescue`節で例外発生時の処理を記述する。
+* `else`節でresucure節が`実行されなかったとき`の処理を書く。
 * `ensure`節 rescue節に続けて記述可能。`最後に必ず実行したい`処理を書く。
   * pythonのfinallyに該当。
+* rescueに続けて指定することで、それ自身orそのサブクラスを捕捉できる。
+  * rescue節に続けて書く場合は、マッチする範囲が広くなる順番に指定すること。
+```ruby
+begin
+rescue ZeroDivisionError => e
+  p e.backtrave
+end
+```
+* 同じスレッド・ブロックで発生した最後の例外は`$!`で参照できる。
+* `raise`メソッドを引数なしで実行すると、最後に発生した例外を再度発生させられる。
+```ruby
+begin
+  1/0
+  rescue ZeroDivisionError
+    p $!.class
+    raise
+end
+```
+* `retry`を呼び出すと、再度rescue節を呼び出すことができる。
+  * 例外が起きた該当箇所で処理を復旧させたい場合に使える。
+* `catch/throw`を使うことで正常時にも処理をジャンプできる。
+  * goto文みたいな感じ？
+```ruby
+def foo
+  throw :exit
+end
+
+catch(:exit) {
+  foo
+  p 1  # 実行されない
+}
+
+p 2
+#=> 2
+```
+
+
+
+# オブジェクト指向関連
+## クラス定義
+* `@変数名` インスタンス変数。
+* `new`メソッド インスタンスを生成。
+```ruby
+class Foo
+  def initialize(a)
+    @a = a
+  end
+
+  def method1
+    @a
+  end
+end
+
+a.new(1)
+```
+## 継承
+* `<`で区切ってクラスオブジェクトを指定することで継承ができる。
+* `super`をカッコと引数を付けずに実行すると、そのままスーパークラスの同盟メソッドに渡して実行する。
+```ruby
+class Foo
+  def initialize(a)
+    @a = a
+  end
+
+  def method1
+    @a
+  end
+end
+
+class FooExt < Foo
+  def initialize(a, b)
+    @b = b
+    super a
+  end
+
+  def method2(c)
+    @a + @b + c
+  end
+end
+
+fooExt = FooExt.new(3, 4)
+p fooExt.method1
+p fooExt.method2(5)
+```
+* スーパークラスの取得。
+```ruby
+FooExt.superclass == Foo
+#=> true
+```
+## メソッドの探索経路
+* インスタンスのメソッドを呼び出して、それがクラスに存在しない場合は、継承元を`右方向`に辿る。
+* 継承関係を省略してクラスを定義すると、自動的に`Object`クラス(Ruby1.9以降では`BasicObject`クラス)を継承する事になる。
+* クラスの継承チェーンを参照する。`ancestors`の実行結果は検索順序と同じ順番で返却される。
+```ruby
+# class Fooの定義は省略
+p Foo.ancestors
+#=> [Foo, Object, Kernel, BasicObject]
+```
+* クラスの包含関係。
+```ruby
+# class Fooの定義は省略
+p Foo < Object
+#=> true
+```
+* オブジェクトが持つインスタンスメソッドを調べる。
+```ruby
+# falseを指定すると、スーパークラスを辿らない
+p Foo.instance_methods(false)
+```
+* オブジェクトが持つインスタンス変数を調べる。
+```ruby
+<オブジェクトインスタンス>.instance_variables
+```
+* `alias` メソッドの別名を付ける。
+```ruby
+alias <新メソッド名> <旧メソッド名>
+```
+* `undef` 指定された定義を取り消す。
+```ruby
+undef <メソッド名>, ...
+```
+* `method_missing`をオーバーライドすることで、メソッドが見つからない時の動作をフックできる。
+## オープンクラス
+* 定義済みのクラスを再定義できる仕組み。
+* 以下の例は標準クラスのStringにメソッドをオープンクラスで再定義している。
+```ruby
+class String
+  def huga; 1; end
+end
+```
+## Mix-in
+
 
 
 
@@ -552,7 +684,6 @@ end
   p i
 end
 ```
-
 ### zip
 ```bash
 # pythonでいうzipみたいな動き。
