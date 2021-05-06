@@ -413,6 +413,9 @@ p /a(bc)*d/ === "abcbcd"
 p /\d/ === "1"
 #=> true
 ```
+* `=~`演算子を使用するよりも、`match`を使用する方が良さそう。
+  * `=~`を使用すると特殊グローバル変数として追加されてしまう。
+* `$*`系の特殊変数はワンライナーなどで使用するべき。普通に読みづらい。
 
 
 
@@ -630,7 +633,209 @@ class String
 end
 ```
 ## Mix-in
+## モジュール
+* 定義方法。
+```ruby
+module Bar
+  def methodA
+    @a
+  end
+end
+```
+* モジュールは単独ではインスタンス化(new)できない。
+* モジュールは継承できない。
+* モジュールはクラスや他のモジュールに取り込むことができる。
+  1. includeが実行される。
+  2. 指定されたモジュールに対応する無名クラスを生成。
+  3. (2)をスーパークラスとの「間」に入れ込む。
+    * ancestorsやsuperclassで参照不可能。
+```ruby
+# class Fooの定義は省略
+# module Barの定義は省略
+class FooExt < Foo
+  include Bar
+end
+```
+* includeの順番が後のもののメソッドが優先して実行される。
+* クラス毎にまとめて、それをクラスで使いまわして共通化するイメージか。
+  * 設計とかどうすれば綺麗にできるんだろうか。
+## 特異クラス・特異メソッド
+* 指定したインスタンスだけに適用されるクラス。
+* シングルトンクラス。
+* `特異クラス`
+  * `extend`メソッドを通して簡潔に書ける。
+```ruby
+class << 対象のオブジェクト
+end
 
+# Barというモジュールが定義済みの前提。
+foo1.extend(Bar)
+```
+* `prepend` メソッドの探索経路を制御できる。
+  * prependしたM1のスーパークラスはC1となる。
+  * 既存の処理に、新規で処理を追加で挟み込むことができる。
+  * ソースがどんどん複雑化しそう。
+    * `Refinements`へ。
+```ruby
+module M1
+  def method1
+    super
+    puts "m1"
+  end
+end
+
+class C1
+  prepend M1
+  def method1
+    puts "c1"
+  end
+end
+
+C1.new.method1
+
+#=> m1
+#=> c1
+```
+* `特異メソッド` インスタンスに直接メソッドを追加する。
+```ruby
+def オブジェクト名.特異メソッド名
+end
+```
+* `Refinements` 
+  * usingされる前に定義済みのbarからのfooの呼び出しは上書きされていない。
+```ruby
+class C
+  def foo
+    puts "C#foo"
+  end
+
+  def bar
+    foo
+  end
+end
+
+module M
+  refine C do
+    def foo
+      puts "C#foo in M"
+    end
+  end
+end
+
+using M
+
+x = C.new
+x.foo
+x.bar
+
+#=> C#foo in M
+#=> C#foo
+```
+## self
+* クラス内部で使用する場合は、そのメソッドを実行するオブジェクトを保持。
+## 変数・定数・メソッドの可視性
+### ローカル変数
+* 英小文字またはアンダースコアで始まる変数名。
+* v1にはクラス内部からアクセスできない。
+```ruby
+v1 = 1
+
+class Qux1
+  p v1
+end
+
+#=> undefined local variable or method `v1' for Qux1:Class (NameError)
+```
+* メソッドにおけるローカル変数の参照。
+  * クラス定義、内部メソッドは独立したスコープを持つ。
+```ruby
+v1 = 1
+
+class Qux2
+  v2 = 2
+  def method1; v1; end
+  def method2; v2; end
+end
+
+Qux2.new.method1
+#=> NameError
+Qux2.new.method2
+#=> NameError
+```
+### グローバル変数
+* グローバル変数はプログラムのどこからでもアクセス可能。
+* 変数名の頭に`$`をつけて定義する。
+```ruby
+$v1 = 1
+
+class Qux2
+  $v2 = 2
+  def method1; p $v1; end
+  def method2; p $v2; end
+end
+
+Qux2.new.method1
+Qux2.new.method2
+```
+### インスタンス変数
+* インスタンス変数は変数名の頭に`@`をつけて定義する。
+* 初期化されていない場合は、`nil`を返却する。
+  * 初期化するにはアクセッサメソッドを経由してセットする必要がある。
+* インスタンス変数はメソッドのように`探索されない`ことに注意する。
+  * 継承もされない。
+```ruby
+@v1 = 1
+
+class Qux3
+  @v2 = 2
+  def method1; p @v1; end
+  def method2; p @v2; end
+end
+
+Qux3.new.method1  #=> nil
+Qux3.new.method2  #=> nil
+
+
+class Qux4
+  attr_accessor :v3
+  def method1; @v3; end
+end
+
+qux4 = Qux4.new
+qux4.v3 = 3
+p qux4.v3  #=> 3
+p qux4.method1  #=> 3
+```
+### クラス変数
+* インスタンス間で共有され、自分自身のクラス・サブクラスでも共有される。
+* `@@`をつけて定義する。
+```ruby
+class Qux5
+  @@v1 = 1
+  def v1; @@v1; end
+  def v1=(value); @@v1=value; end
+end
+
+class Qux5Ext < Qux5
+end
+
+qux5 = Qux5.new
+p qux5.v1
+qux5Ext = Qux5Ext.new
+p qux5Ext.v1
+```
+### 定数
+* 大文字から始まる。
+* 再代入すると警告が発生される。
+* 定数はメソッド内で定義することができない。
+* モジュールやクラスに定義されている定数に対しては`::`を指定してアクセスする。
+* `<モジュール>.constants` 外部から参照可能な定数リストを取得。
+### public
+* publicが指定されていれば、どのインスタンスからも実行できる。
+### protected
+* 自分自身、またはサブクラスのインスタンスから実行できる。
+### private
+* レシーバをつけた呼び出しができない。
 
 
 
