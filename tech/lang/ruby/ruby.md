@@ -44,6 +44,29 @@ irb(main):116:0> b
 ```
 
 
+# 数値
+## 数値リテラル
+* 数値リテラルの中には`_`を入れることができる。
+```ruby
+p 100_000
+```  
+* 2進数(binary)
+```ruby
+p 0b01  # => 1
+p 0b11  # => 3
+```
+* 8進数(octal)
+```ruby
+p 0o7   # => 7
+p 0o10  # => 8
+```
+## UFO演算子
+* 左辺の値が右辺の値より大きければ1、等しければ0、小さければ-1を返却する。
+```ruby
+100 <=> 10   #=> 1
+10 <==> 100  #=> -1
+```
+
 
 # 条件式
 ## if
@@ -90,9 +113,12 @@ when <条件式2> [then]
 else
 end
 ```
+* whenの条件式には複数の条件式を指定することもできる。
+```ruby
+```
 
 
-# 文字列リテラル
+# 文字列
 ## パーセント記法
 ### ダブルクォート文字列
 * 文字列を囲む記号を書いてる人が指定できる。
@@ -101,6 +127,15 @@ end
 a = %*test*
 ```
 ### 式展開
+* シングルクォートで囲む。
+  * 式展開ができない。
+* ダブルクォートで囲む。  
+  * 式展開ができる。
+```ruby
+a = 100
+p 'a is #{a}'  # => "a is \#{a}"
+p "a is #{a}"  $ => "a is 100"
+```  
 * `%q`、`%Q`で式展開する・しないを指定できる。
   * `%q` 式展開しない。
   * `%Q` 式展開する。
@@ -109,9 +144,13 @@ a = 1
 %q!#{a + 1}!
 %Q!#{a + 1}!
 ```
+## 文字列 → ? の変換
+* `to_i`
+  * 数値へ変換。
+  * 123abd45のような文字列が変換対象の場合、左から数値として有効な部分のみ切り出して評価する。
+    * 上記例の場合、返却されるのは123。
 
-
-# 文字列
+## 文字列オブジェクト
 ## 結合
 * `+`、`<<`で連結できる。
 ```ruby
@@ -126,9 +165,42 @@ p a << "by"
 ```
 ## フォーマット指定
 * `sprintf`でフォーマットを指定できる。
+## p, puts, print
+* `p`はデバッグ用に内部構造を出力する。
+  * バックスラッシュ記法で標準出力される。
+* `puts`や`print`は実際に目に見える形で出力する。
+  * バックスラッシュ記法を「解釈」した形で出力する。
+```ruby
+p "this is\na test"
+# => "this is\na test"
 
+puts "this is\na test"
+print "this is\na test"
+# => this is
+# => a test
+```  
+## ヒアドキュメント
+* バックスラッシュ記法による表現は可読性が悪い。
+* ヒアドキュメントとはバックスラッシュ記法を使わないで、可読性良く表現する記法。
+* `注意1` ヒアドキュメントの終端を示す識別子の前にはスペースなどの文字を記述してはならない。
+```ruby
+query = <<SQL
+  select *
+    from table;
+SQL
 
+p query
+# => "  select *\n    from table;\n"
 
+print query
+# =>   select *
+# =>    from table;
+```
+* ヒアドキュメントの識別子をシングルクォートで囲む。
+  * 式展開ができない。
+* ヒアドキュメントの識別子をダブルクォートで囲む。  
+  * 式展開ができる。
+  
 # シンボル
 * シンボルは「文字の並び」が同じであれば、同一のオブジェクトを参照する。
   * 文字列は文字の並びが同じでも、オブジェクトを作る度に異なるオブジェクトが生成されるので「同じ」ではない。
@@ -198,6 +270,16 @@ def foo(a, *b)
   b
 end
 ```
+* キーワード引数
+```ruby
+def test(a:, b:)
+  a + b
+end
+
+
+# p test(100, 100)  # Wront number of Arguments
+p test(a: 100, b: 100)
+```
 
 
 
@@ -211,13 +293,17 @@ irb(main):068:0> v1 = %w(hoge foo bar)
 => ["hoge", "foo", "bar"]
 ```
 * 要素、大きさを指定した定義方法。
+* 定義方法によっては初期化時に格納される要素が同一オブジェクトになる。
+  * (1)の定義方法。別々のオブジェクトとして初期化したい場合は(2)の定義方法を使う。
 ```bash
 irb(main):070:0> a = Array.new(5)
 => [nil, nil, nil, nil, nil]
 
+# (1)
 irb(main):071:0> a = Array.new(2, "a")
 => ["a", "a"]  # 全ての要素は同じオブジェクトを参照する点に注意。
 
+# (2)
 irb(main):072:0> Array.new(2){"a"}
 => ["a", "a"]  # 全ての要素を「別個」に扱いたい場合はこっちの書き方。
 ```
@@ -298,7 +384,17 @@ irb(main):166:0> a = {:foo1 => 1, :foo2 => 2}
 irb(main):167:0> a[:foo1]
 => 1
 ```
-
+* Ruby1.9からは以下のように`:`で区切る定義方法も可能。
+  * この方法で定義するとキーはシンボルとなる。
+```ruby
+a = { foo1: 1, foo2: 2, foo3: 3 }
+```
+* `Array#to_h`を使って二次元配列からハッシュを作成する方法もある。
+```ruby
+arr = [[:foo, 1], [:bar, 2]]
+hash = arr.to_h
+p hash  # => {:foo=>1, :bar=>2}
+```
 
 
 # 範囲
@@ -848,7 +944,59 @@ p qux5Ext.v1
 * `attr_accessor` 読み取り & 書き込みメソッドを定義。
 * `attr_reader` 読み込みメソッドを定義。
 * `attr_writer` 書き込みメソッドを定義。
+### memo
+```ruby
+# グローバル変数の例
+$global_sample01 = 100
+$global_sample = 100
+p $global_sample01
+p $global_sample
 
+
+# ローカル変数の例
+_local_sample01 = 10
+local_sample = 10
+
+p _local_sample01
+p local_sample
+
+
+# クラス変数・インスタンス変数の例
+class SampleClass
+  @@class_variable = "class variable"
+
+  def initialize(var)
+    @instance_variable = var
+  end
+
+  def class_variable
+    @@class_variable
+  end
+
+  def print_instance_variable
+    p @instance_variable
+  end
+end
+
+sc1 = SampleClass.new("sc1")
+p sc1.class_variable
+sc1.print_instance_variable
+
+sc2 = SampleClass.new("sc2")
+p sc2.class_variable
+sc2.print_instance_variable
+
+# クラス変数のオブジェクトIDは同じ
+p sc1.class_variable.object_id
+p sc2.class_variable.object_id
+
+
+# 定数
+CONSTANT_VARIABLE = "constant variable"
+CONSTANT_VARIABLE = "constant variable 2"
+p CONSTANT_VARIABLE
+```
+* 各変数の種別を構文レベルでサポートすることで、コードを読みながら同時にそのスコープも把握できる。
 
 
 
@@ -985,4 +1133,3 @@ puts `ls -a`
 ```ruby
 [1, 2, 3, 4].map { |i| p i ** 2 }
 ```
-##
